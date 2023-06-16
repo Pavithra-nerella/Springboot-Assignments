@@ -163,6 +163,36 @@ class CategoryRestControllerTest {
         // Act and Assert
         assertThrows(RuntimeException.class, () -> categoryRestController.getAllCategories());
     }
+    @Test
+    void testAddCategory_ValidCategory() {
+        // Arrange
+        Category category = new Category(0, "New Category");
 
-   }
+        // Act
+        ResponseEntity<Object> response = categoryRestController.addCategory(category);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(category, response.getBody());
+        verify(categoryService, times(1)).save(category);
+    }
+
+    @Test
+    void testUpdateCategory_ExistingCategory_ValidUpdate() {
+        // Arrange
+        int categoryId = 1;
+        Category existingCategory = new Category(categoryId, "Category1");
+        Category updatedCategory = new Category(categoryId, "Updated Category");
+        when(categoryService.getCategoryById(categoryId)).thenReturn(existingCategory);
+
+        // Act
+        ResponseEntity<Object> response = categoryRestController.updateCategory(categoryId, updatedCategory);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(existingCategory, response.getBody());
+        assertEquals(updatedCategory.getName(), existingCategory.getName());
+        verify(categoryService, times(1)).save(existingCategory);
+    }
+}
 
