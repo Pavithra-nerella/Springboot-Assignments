@@ -31,7 +31,7 @@ import java.util.Optional;
                 theCategory= result.get();
             }
             else {
-                // we didn't find the employee
+
                 throw new RuntimeException("Did not find employee id - " + theId);
             }
 
