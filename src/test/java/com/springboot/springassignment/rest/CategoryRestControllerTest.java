@@ -78,23 +78,25 @@ class CategoryRestControllerTest {
     @Test
     void testAddCategory_InvalidCategory() {
         // Arrange
-        Category category = new Category(0, null);
-        doNothing().when(categoryService).save(any(Category.class));
+        Category categoryWithNullName = new Category(0, null);
+        Category categoryWithEmptyName = new Category(0, "");
 
         // Act
-        ResponseEntity<Object> response = categoryRestController.addCategory(category);
+        ResponseEntity<Object> responseWithNullName = categoryRestController.addCategory(categoryWithNullName);
+        ResponseEntity<Object> responseWithEmptyName = categoryRestController.addCategory(categoryWithEmptyName);
 
         // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Invalid category", response.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, responseWithNullName.getStatusCode());
+        assertEquals("Invalid category", responseWithNullName.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, responseWithEmptyName.getStatusCode());
+        assertEquals("Invalid category", responseWithEmptyName.getBody());
+
         verify(categoryService, never()).save(any(Category.class));
 
         // Additional assertion to cover the condition
-        assertTrue(category.getName() == null || category.getName().isEmpty());
+        assertTrue(categoryWithNullName.getName() == null || categoryWithNullName.getName().isEmpty());
+        assertTrue(categoryWithEmptyName.getName() == null || categoryWithEmptyName.getName().isEmpty());
     }
-
-
-
 
 
     @Test
