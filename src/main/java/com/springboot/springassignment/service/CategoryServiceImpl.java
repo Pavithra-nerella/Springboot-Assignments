@@ -2,7 +2,6 @@ package com.springboot.springassignment.service;
 
 import com.springboot.springassignment.dao.CategoryRepository;
 import com.springboot.springassignment.entity.Category;
-import com.springboot.springassignment.exception.CategoryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +32,7 @@ import java.util.Optional;
             }
             else {
 
-                throw new CategoryNotFoundException("Category not found for id: " + theId);
+                throw new RuntimeException("Did not find employee id - " + theId);
             }
 
             return theCategory;
