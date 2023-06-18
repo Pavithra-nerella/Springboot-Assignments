@@ -304,7 +304,7 @@ void updateProduct_InvalidProduct_ShouldReturnErrorResponse() throws Exception {
     verifyNoMoreInteractions(productService);
 }
     @Test
-    public void testUpdateProductPriceNonZero() {
+    void testUpdateProductPriceNonZero() {
         // Create a mock ProductService
         ProductService productService = mock(ProductService.class);
 
@@ -336,7 +336,7 @@ void updateProduct_InvalidProduct_ShouldReturnErrorResponse() throws Exception {
     }
 
     @Test
-    public void testUpdateProductCategoryNotNull() {
+    void testUpdateProductCategoryNotNull() {
         // Create a mock ProductService
         ProductService productService = mock(ProductService.class);
 

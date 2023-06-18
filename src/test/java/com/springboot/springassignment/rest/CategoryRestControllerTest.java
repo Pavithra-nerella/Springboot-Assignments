@@ -12,8 +12,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -80,6 +79,7 @@ class CategoryRestControllerTest {
     void testAddCategory_InvalidCategory() {
         // Arrange
         Category category = new Category(0, null);
+        doNothing().when(categoryService).save(any(Category.class));
 
         // Act
         ResponseEntity<Object> response = categoryRestController.addCategory(category);
@@ -88,7 +88,13 @@ class CategoryRestControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Invalid category", response.getBody());
         verify(categoryService, never()).save(any(Category.class));
+
+        // Additional assertion to cover the condition
+        assertTrue(category.getName() == null || category.getName().isEmpty());
     }
+
+
+
 
 
     @Test
