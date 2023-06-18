@@ -26,7 +26,7 @@ public class CategoryRestController {
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<?> getCategoryById(@PathVariable("categoryId") int categoryId) {
+    public ResponseEntity<Object> getCategoryById(@PathVariable("categoryId") int categoryId) {
         try {
             Category category = categoryService.getCategoryById(categoryId);
             if (category == null) {
@@ -36,9 +36,10 @@ public class CategoryRestController {
             return ResponseEntity.ok(category);
         } catch (RuntimeException e) {
             String errorMessage = "Failed to retrieve category with ID - " + categoryId;
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
     }
+
     @PostMapping
     public ResponseEntity<Object> addCategory(@RequestBody Category theCategory) {
         if (theCategory.getName() == null || theCategory.getName().isEmpty()) {

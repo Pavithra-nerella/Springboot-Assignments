@@ -1,5 +1,6 @@
 package com.springboot.springassignment.rest;
 
+import com.springboot.springassignment.entity.Category;
 import com.springboot.springassignment.entity.Product;
 import com.springboot.springassignment.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
@@ -357,7 +358,51 @@ void updateProduct_InvalidProduct_ShouldReturnErrorResponse() throws Exception {
         verify(productService, times(1)).getProductById(productId);
         verifyNoMoreInteractions(productService);
     }
+    @Test
+    void updateProduct_ValidPrice_ShouldUpdateProductPrice() throws Exception {
+        int productId = 1;
+        double updatedPrice = 25.0;
+        Product existingProduct = new Product(productId, "Existing Product", 20.0, null);
+        Product updatedProduct = new Product(productId, "Updated Product", updatedPrice, null);
 
+        when(productService.getProductById(productId)).thenReturn(existingProduct);
+
+        mockMvc.perform(put("/products/{productId}", productId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":1,\"name\":\"Updated Product\",\"price\":25.0}"))
+                .andExpect(status().isOk());
+
+        assertEquals(updatedPrice, existingProduct.getPrice());
+
+        verify(productService, times(1)).getProductById(productId);
+        verify(productService, times(1)).save(any(Product.class));
+        verifyNoMoreInteractions(productService);
+    }
+
+    @Test
+    void updateProduct_NullCategory_ShouldNotUpdateProductCategory() throws Exception {
+        int productId = 1;
+        String updatedName = "Updated Product";
+        Category existingCategory = new Category(1, "Category 1");
+        Product existingProduct = new Product(productId, "Existing Product", 20.0, existingCategory);
+        Product updatedProduct = new Product(productId, updatedName, 20.0, null);
+
+        productService = mock(ProductService.class);
+        mockMvc = MockMvcBuilders.standaloneSetup(new ProductRestController(productService)).build();
+
+        when(productService.getProductById(productId)).thenReturn(existingProduct);
+
+        mockMvc.perform(put("/products/{productId}", productId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":1,\"name\":\"Updated Product\",\"price\":20.0,\"category\":null}"))
+                .andExpect(status().isOk());
+
+        assertEquals(existingProduct.getCategory(), existingCategory);
+
+        verify(productService, times(1)).getProductById(productId);
+        verify(productService, times(1)).save(any(Product.class));
+        verifyNoMoreInteractions(productService);
+    }
 
 }
 

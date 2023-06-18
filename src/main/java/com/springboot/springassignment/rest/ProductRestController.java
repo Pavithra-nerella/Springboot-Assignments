@@ -23,17 +23,17 @@ public class ProductRestController {
         return productService.getAllProducts();
     }
 
-@GetMapping("/{productId}")
-public ResponseEntity<?> getProductById(@PathVariable("productId") int productId) {
-    Product product = productService.getProductById(productId);
+    @GetMapping("/{productId}")
+    public ResponseEntity<Object> getProductById(@PathVariable("productId") int productId) {
+        Product product = productService.getProductById(productId);
 
-    if (product == null) {
-        String errorMessage = "Product not found with ID - " + productId;
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        if (product == null) {
+            String errorMessage = "Product not found with ID - " + productId;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
+
+        return ResponseEntity.ok(product);
     }
-
-    return ResponseEntity.ok(product);
-}
 
 @PostMapping
 public ResponseEntity<Object> addProduct(@RequestBody Product theProduct) {
@@ -68,7 +68,8 @@ public ResponseEntity<Object> updateProduct(@PathVariable("productId") int produ
     return ResponseEntity.ok(existingProduct);
 }
 
-@DeleteMapping("/{productId}")
+
+    @DeleteMapping("/{productId}")
 public ResponseEntity<String> deleteProduct(@PathVariable int productId) {
     Product tempProduct = productService.getProductById(productId);
 
@@ -81,7 +82,5 @@ public ResponseEntity<String> deleteProduct(@PathVariable int productId) {
 
     return ResponseEntity.ok("Deleted Product with ID - " + productId);
 }
-
-
 }
 
