@@ -75,6 +75,7 @@ public ResponseEntity<Object> updateCategory(@PathVariable("categoryId") int cat
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }
 }
+
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<String> deleteCategory(@PathVariable int categoryId) {
         try {

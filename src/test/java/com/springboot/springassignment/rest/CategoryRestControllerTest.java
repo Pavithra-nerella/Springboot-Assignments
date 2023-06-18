@@ -92,21 +92,23 @@ class CategoryRestControllerTest {
 
 
     @Test
-    void testUpdateCategory_ExistingCategory_InvalidUpdate() {
+    void testUpdateCategory_ExistingCategory_RuntimeException() {
         // Arrange
         int categoryId = 1;
         Category existingCategory = new Category(categoryId, "Category1");
-        Category updatedCategory = new Category(categoryId, null);
+        Category updatedCategory = new Category(categoryId, "UpdatedCategory");
         when(categoryService.getCategoryById(categoryId)).thenReturn(existingCategory);
+        doThrow(new RuntimeException()).when(categoryService).save(any(Category.class));
 
         // Act
         ResponseEntity<Object> response = categoryRestController.updateCategory(categoryId, updatedCategory);
 
         // Assert
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Invalid category", response.getBody());
-        verify(categoryService, never()).save(any(Category.class));
+        assertEquals("Failed to update category with ID - " + categoryId, response.getBody());
+        verify(categoryService, times(1)).save(updatedCategory);
     }
+
 
 
     @Test
@@ -442,7 +444,7 @@ class CategoryRestControllerTest {
         verify(categoryService, times(1)).getCategoryById(categoryId);
     }
     @Test
-    public void testUpdateCategoryException() {
+    void testUpdateCategoryException() {
         // Create a mock CategoryService
         CategoryService categoryService = mock(CategoryService.class);
 
@@ -472,38 +474,7 @@ class CategoryRestControllerTest {
         // Verify that the response body is the error message
         assertEquals("Invalid category", response.getBody());
     }
-    @Test
-    public void testUpdateCategory_Exception() {
-        // Create a mock CategoryService
-        CategoryService categoryService = mock(CategoryService.class);
 
-        // Create an instance of CategoryRestController and inject the mock CategoryService
-        CategoryRestController controller = new CategoryRestController(categoryService);
-
-        // Specify the category ID
-        int categoryId = 1;
-
-        // Create a mock Category object for the existing category
-        Category existingCategory = mock(Category.class);
-
-        // Mock the categoryService getCategoryById method to return the existing category
-        when(categoryService.getCategoryById(categoryId)).thenReturn(existingCategory);
-
-        // Create an updated category with an invalid name (null)
-        Category updatedCategory = new Category(categoryId, null);
-
-        // Invoke the updateCategory method
-        ResponseEntity<Object> response = controller.updateCategory(categoryId, updatedCategory);
-
-        // Verify that the categoryService save method is never called
-        verify(categoryService, never()).save(existingCategory);
-
-        // Verify that the response status is BAD_REQUEST
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-
-        // Verify that the response body is the expected error message
-        assertEquals("Invalid category", response.getBody());
-    }
 
 }
 
