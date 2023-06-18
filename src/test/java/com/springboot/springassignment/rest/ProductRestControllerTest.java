@@ -7,7 +7,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -301,6 +303,70 @@ void updateProduct_InvalidProduct_ShouldReturnErrorResponse() throws Exception {
     verify(productService, times(1)).save(product);
     verifyNoMoreInteractions(productService);
 }
+    @Test
+    public void testUpdateProductPriceNonZero() {
+        // Create a mock ProductService
+        ProductService productService = mock(ProductService.class);
+
+        // Create a mock existing product
+        Product existingProduct = new Product(1, "Existing Product", 10.0, null);
+
+        // Create an updated product with a non-zero price
+        Product updatedProduct = new Product(1, null, 20.0, null);
+
+        // Mock the getProductById method to return the existing product
+        when(productService.getProductById(1)).thenReturn(existingProduct);
+
+        // Create an instance of ProductRestController and inject the mock ProductService
+        ProductRestController controller = new ProductRestController(productService);
+
+        // Call the updateProduct method
+        ResponseEntity<Object> response = controller.updateProduct(1, updatedProduct);
+
+        // Verify that the existing product's price has been updated
+        assertEquals(20.0, existingProduct.getPrice());
+
+        // Verify that the product is saved through the ProductService
+        verify(productService, times(1)).save(existingProduct);
+
+        // Verify that the response status is OK
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        // Verify that the response body is the updated product
+        assertEquals(existingProduct, response.getBody());
+    }
+
+    @Test
+    public void testUpdateProductCategoryNotNull() {
+        // Create a mock ProductService
+        ProductService productService = mock(ProductService.class);
+
+        // Create a mock existing product
+        Product existingProduct = new Product(1, "Existing Product", 10.0, null);
+
+        // Create an updated product with a non-null category
+        Category updatedCategory = new Category(1, "Updated Category");
+        Product updatedProduct = new Product(1, null, 0.0, updatedCategory);
+
+        // Mock the getProductById method to return the existing product
+        when(productService.getProductById(1)).thenReturn(existingProduct);
+
+        // Create an instance of ProductRestController and inject the mock ProductService
+        ProductRestController controller = new ProductRestController(productService);
+
+        // Call the updateProduct method
+        ResponseEntity<Object> response = controller.updateProduct(1, updatedProduct);
+
+        // Verify that the existing product's category has been updated
+        assertEquals(updatedCategory, existingProduct.getCategory());
+
+        // Verify that the product is saved through the ProductService
+        verify(productService, times(1)).save(existingProduct);
+
+        // Verify that the response status is OK
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        // Verify that the response body is the updated product
+        assertEquals(existingProduct, response.getBody());
+    }
 
 
 

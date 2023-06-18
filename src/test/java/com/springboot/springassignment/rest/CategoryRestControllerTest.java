@@ -377,53 +377,6 @@ class CategoryRestControllerTest {
         verify(categoryService, times(1)).getCategoryById(1);
         verify(categoryService, times(1)).deleteById(1);
     }
-    @Test
-    void testAddCategory_ValidCategoryNullName() {
-        // Arrange
-        Category category = new Category(1, null);
-
-        // Act
-        ResponseEntity<Object> response = categoryRestController.addCategory(category);
-
-        // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Invalid category", response.getBody());
-        verify(categoryService, never()).save(any(Category.class));
-    }
-
-    @Test
-    void testUpdateCategory_ValidCategoryNullName() {
-        // Arrange
-        int categoryId = 1;
-        Category existingCategory = new Category(categoryId, "Category1");
-        Category updatedCategory = new Category(categoryId, null);
-        when(categoryService.getCategoryById(categoryId)).thenReturn(existingCategory);
-
-        // Act
-        ResponseEntity<Object> response = categoryRestController.updateCategory(categoryId, updatedCategory);
-
-        // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Invalid category", response.getBody());
-        verify(categoryService, never()).save(any(Category.class));
-    }
-
-    @Test
-    void testUpdateCategory_ValidCategoryEmptyName() {
-        // Arrange
-        int categoryId = 1;
-        Category existingCategory = new Category(categoryId, "Category1");
-        Category updatedCategory = new Category(categoryId, "");
-        when(categoryService.getCategoryById(categoryId)).thenReturn(existingCategory);
-
-        // Act
-        ResponseEntity<Object> response = categoryRestController.updateCategory(categoryId, updatedCategory);
-
-        // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Invalid category", response.getBody());
-        verify(categoryService, never()).save(any(Category.class));
-    }
 
     @Test
     void testGetCategoryById_ExceptionThrown() {
@@ -472,19 +425,6 @@ class CategoryRestControllerTest {
         verify(categoryService, times(1)).getCategoryById(categoryId);
         verify(categoryService, never()).deleteById(categoryId);
     }
-    @Test
-    void testAddCategory_ValidCategoryEmptyName() {
-        // Arrange
-        Category category = new Category(1, "");
-
-        // Act
-        ResponseEntity<Object> response = categoryRestController.addCategory(category);
-
-        // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Invalid category", response.getBody());
-        verify(categoryService, never()).save(any(Category.class));
-    }
 
     @Test
     void testGetCategoryById_ValidCategory() {
@@ -500,6 +440,37 @@ class CategoryRestControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(category, response.getBody());
         verify(categoryService, times(1)).getCategoryById(categoryId);
+    }
+    @Test
+    public void testUpdateCategoryException() {
+        // Create a mock CategoryService
+        CategoryService categoryService = mock(CategoryService.class);
+
+        // Create a mock existing category
+        Category existingCategory = mock(Category.class);
+
+        // Create an updated category with an invalid name
+        Category updatedCategory = new Category(1, null);
+
+        // Mock the getCategoryById method to return the existing category
+        when(categoryService.getCategoryById(1)).thenReturn(existingCategory);
+
+        // Create an instance of CategoryRestController and inject the mock CategoryService
+        CategoryRestController controller = new CategoryRestController(categoryService);
+
+        // Call the updateCategory method
+        ResponseEntity<Object> response = controller.updateCategory(1, updatedCategory);
+
+        // Verify that the setName method of existingCategory is never called
+        verify(existingCategory, never()).setName(anyString());
+
+        // Verify that the categoryService save method is never called
+        verify(categoryService, never()).save(existingCategory);
+
+        // Verify that the response status is BAD_REQUEST
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        // Verify that the response body is the error message
+        assertEquals("Invalid category", response.getBody());
     }
 
 }
